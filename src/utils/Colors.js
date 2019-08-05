@@ -18,4 +18,6 @@ export default Colors = {
   googleRed: '#E44845',
   //Yellows
   yellow: '#FACE57',
+  //Black
+  black: '#000',
 };

@@ -1,142 +1,51 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
-import { View, Input, Text, Container, Item, Footer, Icon, Button } from 'native-base';
+import { TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Input, Text, Container, Item, Button } from 'native-base';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import validator from 'validator';
+
 import Colors from '../../utils/Colors';
-
-export default class Login extends Component {
-  constructor(props) {
-    super(props);
-    
-    this.state = { login: '', password: '' };
-  }
-
-  login = () => {
-    let { login, password } = this.state;
-    // Alert.alert('Logando!', `Seu email é: ${login} \nE sua senha é: ${password}`);
-  }
-
-  forgotPassword = () => {
-    this.props.navigation.push('ForgotPasswordEmail');
-  }
-
-  loginGoogle = () => {
-
-  }
-
-  loginFacebook = () => {
-
-  }
-
-  register = () => {
-    this.props.navigation.push('RegisterLocation');
-  }
-
-  policy = () => {
-
-  }
-
-  render() {
-    return(
-      <Container style={style.container}>
-        <Text style={style.cleanup}>CLEANUP</Text>
-        <View style={style.content}>
-          <Item style={style.borderTransparent}>
-            <Input
-              autoCorrect={false}
-              selectionColor={Colors.white}
-              placeholder={'E-mail'}
-              placeholderTextColor={'#DADADA'}
-              style={[style.input, style.login]}
-              onChangeText={login => this.setState({login})}
-              onEndEditing={() => this.refs['pass']._root.focus()}
-              returnKeyType={'next'}
-              />
-          </Item>
-          <Item style={style.borderTransparent}>
-            <Input
-              ref={'pass'}
-              selectionColor={Colors.white}
-              secureTextEntry={true}
-              placeholder={'Senha'}
-              placeholderTextColor={'#DADADA'}
-              style={[style.input, style.password]}
-              onChangeText={password => this.setState({password})}
-              onEndEditing={this.onSingIn}
-              returnKeyType={'go'}
-              />
-          </Item>
-          <View style={style.buttonsView}>
-            <View style={style.loginButtonView}>
-              <TouchableOpacity onPress={this.login}>
-                <Text style={style.loginButton}>Entrar</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={style.forgotPasswordView}>
-              <TouchableOpacity onPress={this.forgotPassword}>
-                <Text style={style.forgotPassword}>Esqueci a Senha</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <Button full iconLeft style={style.buttonGoogle} onPress={this.loginGoogle}>
-            <Icon name='logo-google'/>
-            <Text uppercase={false} style={style.buttonText}>Entrar com Google</Text>
-          </Button>
-          <Button full iconLeft style={style.buttonFB} onPress={this.loginFacebook}>
-            <Icon name='logo-facebook'/>
-            <Text uppercase={false} style={style.buttonText}>Entrar com Facebook</Text>
-          </Button>
-          <Text style={[style.cleanup, style.noAccount]}>Não possui conta?</Text>
-          <TouchableOpacity onPress={this.register}>
-            <Text style={[style.cleanup, style.register]}>Registrar Agora</Text>
-          </TouchableOpacity>
-          <Footer style={style.footer}>
-            <TouchableOpacity onPress={this.policy}>
-              <Text style={style.policy}>Política de Privacidade e Termos de Uso</Text>
-            </TouchableOpacity>
-          </Footer>
-        </View>
-      </Container>
-    );
-  }
-}
+import Loader from '../../components/Loader';
+import { login } from '../../requesters/auth';
+import { fetchUserSignIn } from '../../redux/actions/auth';
 
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.lightGreen,
+    backgroundColor: Colors.white,
   },
   content: {
     flex: 1,
     marginHorizontal: 30,
   },
-  cleanup: {
-    color: Colors.white,
-    fontSize: 22,
+  title: {
+    color: Colors.black,
+    fontSize: 25,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 30,
+    marginTop: 50,
   },
   login: { marginTop: 130, },
-  password: { marginTop: 10, },
+  password: { marginTop: 30, },
   input: {
-    color: Colors.white,
+    color: Colors.black,
     fontSize: 20,
     borderWidth: 1,
     borderRadius: 7,
-    borderColor: '#2EAFB0',
-    backgroundColor: '#34C3C5',
+    borderColor: Colors.lightGrey4,
+    backgroundColor: Colors.lightGrey2,
   },
   buttonsView: { flexDirection: 'row', marginTop: 8 },
   loginButtonView: {
-    flex: 0.5,
+    flex: 1,
     justifyContent: 'center',
-    alignItems: 'flex-start',
-    marginLeft: 3
+    alignItems: 'center',
+    marginTop: 40,
   },
   loginButton: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.white
   },
   forgotPasswordView: {
     flex: 0.5,
@@ -145,38 +54,112 @@ const style = StyleSheet.create({
   },
   forgotPassword: {
     fontSize: 18,
-    color: Colors.white
+    color: Colors.black
   },
   button: {
     height: 55,
     marginTop: 30,
     elevation: 2,
     borderRadius: 5,
-    backgroundColor: Colors.white,
-  },
-  buttonGoogle: {
-    height: 55,
-    marginTop: 30,
-    elevation: 2,
-    borderRadius: 5,
-    backgroundColor: Colors.googleRed,
-  },
-  buttonFB: {
-    height: 55,
-    marginTop: 10,
-    elevation: 2,
-    borderRadius: 5,
-    backgroundColor: Colors.fbBlue,
-  },
-  buttonText: {
-    color: Colors.white,
-    fontSize: 17,
-    fontWeight: 'bold',
-    fontStyle: 'normal',
+    backgroundColor: Colors.black,
   },
   noAccount: { fontSize: 18, fontWeight: 'normal', marginTop: 45 },
   register: { fontSize: 18, marginTop: 6 },
-  policy: { fontSize: 17, color: Colors.white, textAlign: 'center', justifyContent: 'flex-end' },
-  footer: { backgroundColor: 'transparent', alignItems: 'flex-end' },
   borderTransparent: { borderColor: 'transparent' },
 });
+
+class Login extends Component {
+  constructor(props) {
+    super(props);
+    
+    this.state = { email: 'bruno@adn23.com.br', password: '123456', loading: false };
+  }
+
+  validate = () => {
+    const { email, password } = this.state;
+
+    let errorMsg = null;
+    if(!email) {
+      errorMsg = 'Por favor, preencha seu email de login!';
+    } else if(!validator.isEmail(email)) {
+      errorMsg = 'O email é inválido!';
+    } else if(!password) {
+      errorMsg = 'Por favor, preencha sua senha!';
+    }
+    if(errorMsg) Alert.alert('Atenção', errorMsg);
+
+    return (errorMsg === null);
+  }
+
+  login = () => {
+    if(!this.validate()) return;
+
+    const { email, password } = this.state;
+    this.setState({ loading: true });
+    this.props.fetchUserSignIn(email, password).then(res => {
+      this.setState({ loading: false });
+      this.props.navigation.navigate('Home');
+    }).catch(err => {
+      this.setState({ loading: false });
+      Alert.alert('Erro', err);
+    });
+  }
+
+  register = () => {
+    this.props.navigation.push('Register');
+  }
+
+  render() {
+    return(
+      <Container style={style.container}>
+        <Text style={style.title}>Mobills</Text>
+        <View style={style.content}>
+          <Item style={style.borderTransparent}>
+            <Input
+              autoCorrect={false}
+              placeholder={'Email'}
+              placeholderTextColor={Colors.lightGrey3}
+              style={[style.input, style.login]}
+              value={this.state.email}
+              onChangeText={email => this.setState({email})}
+              onEndEditing={() => this.refs['pass']._root.focus()}
+              returnKeyType={'next'}
+              keyboardType={'email-address'}
+              />
+          </Item>
+          <Item style={style.borderTransparent}>
+            <Input
+              ref={'pass'}
+              secureTextEntry={true}
+              placeholder={'Senha'}
+              placeholderTextColor={Colors.lightGrey3}
+              style={[style.input, style.password]}
+              value={this.state.password}
+              onChangeText={password => this.setState({password})}
+              onEndEditing={this.login}
+              returnKeyType={'go'}
+              />
+          </Item>
+          <View style={style.buttonsView}>
+            <View style={style.loginButtonView}>
+              <Button onPress={this.login} block>
+                <Text style={style.loginButton} uppercase={false}>Entrar</Text>
+              </Button>
+            </View>
+          </View>
+          <Text style={[style.title, style.noAccount]}>Não possui conta?</Text>
+          <TouchableOpacity onPress={this.register}>
+            <Text style={[style.title, style.register]}>Registrar Agora</Text>
+          </TouchableOpacity>
+        </View>
+        <Loader show={this.state.loading}/>
+      </Container>
+    );
+  }
+}
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+  fetchUserSignIn
+}, dispatch);
+
+export default connect(null, mapDispatchToProps)(Login);
