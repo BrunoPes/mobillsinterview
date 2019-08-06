@@ -1,21 +1,22 @@
 import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
-import { Spinner, Text, Button, Container, Content, Card, CardItem, Body, Label, Left, Right, View } from 'native-base';
+import { TouchableOpacity, StyleSheet } from 'react-native';
+import { Spinner, Text, Container, Content, Fab, Card, CardItem, Body, Label, Left, Right, View, Icon } from 'native-base';
 import { connect } from 'react-redux';
+import _ from 'lodash';
 import moment from 'moment';
+import masker from 'vanilla-masker';
 
 import { createExpense, getExpenses } from '../../requesters/operations';
 import Header from '../../components/Header';
-
-const badgeSize = 5;
+import HomeTabs from '../../components/HomeTabs';
 
 const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 10,
   },
   body: { flexDirection: 'row' },
-  left: { flex: 0.7 },
-  right: { flex: 0.3, alignSelf:  'flex-start', },
+  left: { flex: 0.60 },
+  right: { flex: 0.40, alignSelf:  'flex-start', },
   labelValue: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -24,14 +25,15 @@ const styles = StyleSheet.create({
   footer: { marginTop: 0, paddingTop: 0 },
   date: { fontSize: 13, color: '#666' },
   button: {
+    marginTop: 10,
     marginBottom: 20,
-    marginHorizontal: 20,
   }
 });
 
 class Home extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       expenses: [],
       loading: true,
@@ -39,65 +41,81 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    console.log('USER ID: ', this.props.userId, this.props.name);
+    this.loadExpenses();
+  }
+
+  loadExpenses = () => {
+    this.setState({ loading: true });
     getExpenses(this.props.userId).then(expenses => {
-      this.setState({ expenses, loading: false });
+      const expensesWithMoment = expenses.map(e => ({ ...e, dateMoment: moment(e.date) }));
+      const expensesOrdered = _.orderBy(expensesWithMoment, 'dateMoment', 'desc');
+      this.setState({
+        expenses: expensesOrdered,
+        loading: false
+      });
     }).catch(err => {
       this.setState({ loading: false });
     });
   }
 
-  createDespesa = () => {
-    const values = {
-      value: 39.83,
-      description: 'Burger King - Combo mega stacker',
-      date: moment().format('YYYY-MM-DD HH:mm:ss'),
-      paid: true,
-    };
-    createExpense(this.props.userId, values);
+  createDespesa = (item = null) => {
+    this.props.navigation.push('CreateExpense', {
+      reload: this.loadExpenses,
+      expense: item ? {...item, dateMoment: null} : {},
+    });
   }
 
   renderItem = (item, key) => {
     const { value, description, date, paid } = item;
-    const fixedValue = parseFloat(value).toFixed(2).replace('.', ',');
+    const fixedValue =  masker.toMoney(parseFloat(value));
     const formattedDate = moment(date).format('DD/MM/YYYY');
     const paidLabel = paid ? 'Pago' : 'Não foi pago';
     return (
-      <Card key={key}>
-        <CardItem>
-          <Body style={styles.body}>
-            <Left style={styles.left}>
-              <Label>{description}</Label>
+      <TouchableOpacity key={key} onPress={() => this.createDespesa(item)}>
+        <Card>
+          <CardItem>
+            <Body style={styles.body}>
+              <Left style={styles.left}>
+                <Label>{description}</Label>
+              </Left>
+              <Right style={styles.right}>
+                <Label style={styles.labelValue}>R$ {fixedValue}</Label>
+              </Right>
+            </Body>
+          </CardItem>
+          <CardItem footer style={styles.footer}>
+            <Left>
+              <Text style={[styles.date, { marginLeft: 0 }]}>{formattedDate}</Text>
             </Left>
-            <Right style={styles.right}>
-              <Label style={styles.labelValue}>R$ {fixedValue}</Label>
+            <Right>
+              <Text style={styles.date}>{paidLabel}</Text>
             </Right>
-          </Body>
-        </CardItem>
-        <CardItem footer style={styles.footer}>
-          <Left>
-            <Text style={[styles.date, { marginLeft: 0 }]}>{formattedDate}</Text>
-          </Left>
-          <Right>
-            <Text style={styles.date}>{paidLabel}</Text>
-          </Right>
-        </CardItem>
-      </Card>
+          </CardItem>
+        </Card>
+      </TouchableOpacity>
     );
   }
 
-  render() {
+  renderDespesasTab = () => {
     const { expenses, loading } = this.state;
     return (
-      <Container>
-        <Header title={'Home'} onBack={null}/>
+      <View style={{ flex: 1 }}>
         <Content style={styles.content}>
           {loading && <Spinner/>}
           {!loading && expenses.map(this.renderItem)}
         </Content>
-        <Button block style={styles.button} onPress={this.createDespesa}>
-          <Text uppercase={false}>Criar Despesa</Text>
-        </Button>
+        <Fab direction="up" position="bottomRight" onPress={this.createDespesa}>
+          <Icon name="md-add" />
+        </Fab>
+      </View>
+    );
+  }
+
+  render() {
+    return (
+      <Container>
+        <Header title={'Home'} onBack={null} hasTabs={true}/>
+        <HomeTabs despesasTab={this.renderDespesasTab()}/>
       </Container>
     );
   }

@@ -17,9 +17,10 @@ const HeaderView = ({
   leftButtonStyle = {},
   leftIconStyle = {},
   titleStyle = {},
+  hasTabs = false,
   icon = 'arrow-back'
 }) => (
-  <Header>
+  <Header hasTabs={hasTabs}>
     <Left style={{ flex: 0.15}}>
       {(onBack !== null && onBack !== undefined) &&
         <Button transparent onPress={() => onBack()} style={{ ...leftButtonStyle }}>
