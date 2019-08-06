@@ -3,6 +3,7 @@ import { createSwitchNavigator, createStackNavigator, createAppContainer } from 
 import Login from '../pages/login';
 import Register from '../pages/register';
 import Home from '../pages/home';
+import CreateExpense from '../pages/home/CreateExpense';
 
 const AuthStack = createStackNavigator({
   Login,
@@ -16,6 +17,7 @@ const AuthStack = createStackNavigator({
 
 const AppStack = createStackNavigator({
   Home,
+  CreateExpense,
 }, {
   initialRouteName: 'Home',
   defaultNavigationOptions: ({ navigation }) => ({
