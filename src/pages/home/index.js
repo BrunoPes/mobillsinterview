@@ -9,6 +9,7 @@ import masker from 'vanilla-masker';
 import { getExpenses, getIncomes } from '../../requesters/operations';
 import Header from '../../components/Header';
 import HomeTabs from '../../components/HomeTabs';
+import GeneralInfo from './GeneralInfo';
 
 const styles = StyleSheet.create({
   content: {
@@ -53,6 +54,7 @@ class Home extends Component {
       const expensesWithMoment = expenses.map(e => ({
         ...e,
         value: e.value.toFixed(2).replace('.', ''),
+        floatValue: e.value,
         dateMoment: moment(e.date)
       }));
       const expensesOrdered = _.orderBy(expensesWithMoment, 'dateMoment', 'desc');
@@ -71,6 +73,7 @@ class Home extends Component {
       const incomesWithMoment = incomes.map(e => ({
         ...e,
         value: e.value.toFixed(2).replace('.', ''),
+        floatValue: e.value,
         dateMoment: moment(e.date)
       }));
       const incomesOrdered = _.orderBy(incomesWithMoment, 'dateMoment', 'desc');
@@ -164,11 +167,23 @@ class Home extends Component {
     );
   }
 
+  renderGenerailInfoTab = () => {
+    const { incomes, expenses, loadingIncomes, loadingExpenses } = this.state;
+    return (
+      <GeneralInfo
+        incomes={incomes}
+        expenses={expenses}
+        loading={loadingIncomes || loadingExpenses}
+      />
+    )
+  }
+
   render() {
     return (
       <Container>
         <Header title={'Home'} onBack={null} hasTabs={true}/>
         <HomeTabs
+          generalInfoTab={this.renderGenerailInfoTab()}
           despesasTab={this.renderDespesasTab()}
           receitasTab={this.renderReceitasTab()}
         />
