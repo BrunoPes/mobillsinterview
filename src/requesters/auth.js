@@ -12,6 +12,11 @@ export const login = async (email, password) => {
   return await fetch(request);
 };
 
+export const logout = async () => {
+  const request = Auth.signOut();
+  return await fetch(request);
+};
+
 export const updateUser = async (profile) => {
   const request = Auth.currentUser.updateProfile(profile);
   return await fetch(request);

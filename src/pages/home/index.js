@@ -1,12 +1,18 @@
 import React, { Component } from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
-import { Spinner, Text, Container, Content, Fab, Card, CardItem, Body, Label, Left, Right, View, Icon } from 'native-base';
+import {
+  Spinner, Text, Container, Content, Fab, Card, CardItem, Body, Label, Left, Right, View, Icon, Button
+} from 'native-base';
+
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import moment from 'moment';
 import masker from 'vanilla-masker';
 
+import { fetchUserSignOut } from '../../redux/actions/auth';
 import { getExpenses, getIncomes } from '../../requesters/operations';
+import Loader from '../../components/Loader';
 import Header from '../../components/Header';
 import HomeTabs from '../../components/HomeTabs';
 import GeneralInfo from './GeneralInfo';
@@ -40,12 +46,24 @@ class Home extends Component {
       incomes: [],
       loadingExpenses: true,
       loadingIncomes: true,
+      loadingLogout: false,
     };
   }
 
   componentDidMount() {
     this.loadExpenses();
     this.loadIncomes();
+  }
+
+  logout = () => {
+    this.setState({ loadingLogout: true });
+    this.props.fetchUserSignOut().then(_ => {
+      this.setState({ loadingLogout: false });
+      this.props.navigation.navigate('Auth');
+    }).catch(err => {
+      console.log('Logout error: ', err);
+      this.setState({ loadingLogout: false });
+    });
   }
 
   loadExpenses = () => {
@@ -178,15 +196,29 @@ class Home extends Component {
     )
   }
 
+  renderLogoutButton = () => {
+    return (
+      <Button transparent onPress={this.logout}>
+        <Icon name={'md-exit'}/>
+      </Button>
+    );
+  }
+
   render() {
     return (
       <Container>
-        <Header title={'Home'} onBack={null} hasTabs={true}/>
+        <Header
+          title={'Home'}
+          right={this.renderLogoutButton()}
+          onBack={null}
+          hasTabs
+        />
         <HomeTabs
           generalInfoTab={this.renderGenerailInfoTab()}
           despesasTab={this.renderDespesasTab()}
           receitasTab={this.renderReceitasTab()}
         />
+        <Loader show={this.state.loadingLogout}/>
       </Container>
     );
   }
@@ -197,4 +229,8 @@ const mapStateToProps = ({auth}) => ({
   name: auth.name,
 });
 
-export default connect(mapStateToProps)(Home);
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  fetchUserSignOut
+}, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

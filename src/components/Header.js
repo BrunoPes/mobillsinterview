@@ -13,7 +13,7 @@ import {
 const HeaderView = ({
   title,
   onBack,
-  right,
+  right = null,
   leftButtonStyle = {},
   leftIconStyle = {},
   titleStyle = {},
@@ -34,9 +34,7 @@ const HeaderView = ({
       </Title>
     </Body>
     <Right style={{ flex: 0.15 }}>
-      {right &&
-        {right}
-      }
+      {right !== null && right}
     </Right>
   </Header>
 );
