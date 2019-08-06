@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import { StyleSheet, Alert } from 'react-native';
 import { Container, Content, Form, Item, Label, Input, Button, Text } from 'native-base';
 import Validator from 'validator';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 
+import { fetchUserSignIn } from '../../redux/actions/auth';
 import { register, updateUser } from '../../requesters/auth';
 import Header from '../../components/Header';
 import Loader from '../../components/Loader';
@@ -70,12 +73,17 @@ class Register extends Component {
 
     this.setState({ saving: true });
     register(email, password).then(res => {
-      this.setState({ saving: false });
-      updateUser({ displayName: name });
+      const { error } = res || {};
+      if(error) {
+        this.setState({ saving: false });
+        return Alert.alert('Atenção', error);
+      }
 
-      const { error } = res;
-      if(error) return Alert.alert('Atenção', error);
-      return this.goBack();
+      updateUser({ displayName: name });
+      return this.props.fetchUserSignIn(email, password).then(_ => {
+        this.setState({ saving: false });
+        this.props.navigation.navigate('Home');
+      });
     });
   }
 
@@ -138,4 +146,8 @@ class Register extends Component {
   }
 }
 
-export default Register;
+const mapDispatchToProps = (dispatch) => bindActionCreators({
+  fetchUserSignIn
+}, dispatch);
+
+export default connect(null, mapDispatchToProps)(Register);
