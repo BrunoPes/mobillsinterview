@@ -6,7 +6,7 @@ import moment from 'moment';
 import 'moment/locale/pt-br';
 import masker from 'vanilla-masker';
 
-import { createExpense, updateExpense, deleteExpense } from '../../requesters/operations';
+import { createIncome, updateIncome, deleteIncome } from '../../requesters/operations';
 import Header from '../../components/Header';
 import Loader from '../../components/Loader';
 
@@ -17,17 +17,17 @@ const styles = StyleSheet.create({
   button: { marginHorizontal: 20, marginBottom: 20 },
 });
 
-class CreateExpense extends Component {
+class CreateIncome extends Component {
   constructor(props) {
     super(props);
 
-    const expense = props.navigation.getParam('expense');
+    const income = props.navigation.getParam('income');
     this.state = {
-      reference: expense.reference || null,
-      value: expense && expense.value ? masker.toMoney(expense.value) : '',
-      description: expense.description || '',
-      date: expense && expense.date ? moment(expense.date).format('DD/MM/YYYY') : null,
-      paid: expense.paid || false,
+      reference: income.reference || null,
+      value: income && income.value ? masker.toMoney(income.value) : '',
+      description: income.description || '',
+      date: income && income.date ? moment(income.date).format('DD/MM/YYYY') : null,
+      received: income.received || false,
       saving: false,
     };
   }
@@ -51,8 +51,8 @@ class CreateExpense extends Component {
     this.setState({ description: value });
   }
 
-  onChangePaid = (paid) => {
-    this.setState({ paid });
+  onChangeReceived = (received) => {
+    this.setState({ received });
   }
 
   onChangeDate = async () => {
@@ -90,15 +90,15 @@ class CreateExpense extends Component {
     if(!this.validate()) return;
 
     const reload = this.props.navigation.getParam('reload', null);
-    const { reference, value, description, date, paid } = this.state;
+    const { reference, value, description, date, received } = this.state;
     const values = {
       value: parseFloat(value.replace(/\./g, '').replace(',', '.')),
       description,
-      paid,
+      received,
       date: moment(date, 'DD/MM/YYYY').format('YYYY-MM-DD'),
     };
 
-    const operation = reference ? updateExpense(reference, values) : createExpense(this.props.userId, values);
+    const operation = reference ? updateIncome(reference, values) : createIncome(this.props.userId, values);
 
     this.setState({ saving: true });
     operation.then(res => {
@@ -116,7 +116,7 @@ class CreateExpense extends Component {
     const reload = this.props.navigation.getParam('reload', null);
     if(reference) {
       this.setState({ saving: true });
-      deleteExpense(reference).then(res => {
+      deleteIncome(reference).then(res => {
         this.setState({ saving: false });
   
         const { error } = res || {};
@@ -129,7 +129,7 @@ class CreateExpense extends Component {
 
   render() {
     const isNew = this.state.reference === null;
-    const title = isNew ? 'Nova Despesa' : 'Atualizar Despesa';
+    const title = isNew ? 'Nova Receita' : 'Atualizar Receita';
     const buttonTitle = isNew ? 'Registrar' : 'Atualizar';
     return(
       <Container>
@@ -161,9 +161,9 @@ class CreateExpense extends Component {
               <Input disabled value={this.state.date}/>
             </Item>
             <Item onPress={this.onChangeDate} style={styles.itemSwitch}>
-              <Label>Pago</Label>
+              <Label>Recebido</Label>
               <Right>
-                <Switch value={this.state.paid} onValueChange={this.onChangePaid}/>
+                <Switch value={this.state.received} onValueChange={this.onChangeReceived}/>
               </Right>
             </Item>
           </Form>
@@ -186,4 +186,4 @@ const mapStateToProps = ({auth}) => ({
   userId: auth.userId
 });
 
-export default connect(mapStateToProps)(CreateExpense);
+export default connect(mapStateToProps)(CreateIncome);

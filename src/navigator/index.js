@@ -4,6 +4,7 @@ import Login from '../pages/login';
 import Register from '../pages/register';
 import Home from '../pages/home';
 import CreateExpense from '../pages/home/CreateExpense';
+import CreateIncome from '../pages/home/CreateIncome';
 
 const AuthStack = createStackNavigator({
   Login,
@@ -18,6 +19,7 @@ const AuthStack = createStackNavigator({
 const AppStack = createStackNavigator({
   Home,
   CreateExpense,
+  CreateIncome,
 }, {
   initialRouteName: 'Home',
   defaultNavigationOptions: ({ navigation }) => ({

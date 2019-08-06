@@ -8,13 +8,13 @@ const TabFactory = ({ icon, text }) => (
   </TabHeading>
 );
 
-const HomeTabs = ({ despesasTab }) => (
+const HomeTabs = ({ despesasTab, receitasTab }) => (
   <Tabs>
     <Tab heading={TabFactory({icon: 'apps', text: 'Início'})}>
       <Text>PÁGINA 1</Text>
     </Tab>
     <Tab heading={TabFactory({icon: 'md-add', text: 'Receitas'})}>
-    <Text>PÁGINA 2</Text>
+      {receitasTab}
     </Tab>
     <Tab heading={TabFactory({icon: 'md-remove', text: 'Despesas'})}>
       {despesasTab}
