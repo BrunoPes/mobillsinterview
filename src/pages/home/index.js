@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet, BackHandler } from 'react-native';
 import {
   Spinner, Text, Container, Content, Fab, Card, CardItem, Body, Label, Left, Right, View, Icon, Button
 } from 'native-base';
@@ -51,8 +51,15 @@ class Home extends Component {
   }
 
   componentDidMount() {
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      return true;
+    });
     this.loadExpenses();
     this.loadIncomes();
+  }
+
+  componentWillUnmount() {
+    this.backHandler.remove();
   }
 
   logout = () => {
