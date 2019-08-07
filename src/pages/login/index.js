@@ -72,7 +72,7 @@ class Login extends Component {
   constructor(props) {
     super(props);
     
-    this.state = { email: 'bruno@adn23.com.br', password: '123456', loading: false };
+    this.state = { email: '', password: '', loading: false };
   }
 
   validate = () => {
