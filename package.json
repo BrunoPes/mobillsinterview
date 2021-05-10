@@ -11,7 +11,7 @@
     "@react-native-firebase/app": "^0.1.1",
     "@react-native-firebase/auth": "^0.1.1",
     "@react-native-firebase/firestore": "^0.1.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "moment": "^2.24.0",
     "native-base": "^2.13.4",
     "react": "16.8.6",
